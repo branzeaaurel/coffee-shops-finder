@@ -53,10 +53,31 @@ Response:
 
 PHP 8.3 · Symfony 7 · Docker
 
-## Setup
+## Running
+
+> Requirements: Docker and Docker Compose v2. No PHP needed on the host.
 
 ```bash
-docker compose up -d
+git clone <repo-url> coffee-shops-finder
+cd coffee-shops-finder
+
+make up        # build image and start the container
+make install   # install PHP dependencies via Composer
+make test      # run PHPUnit test suite
+make stan      # run PHPStan static analysis
+make cs-check  # check code style (PHP CS Fixer)
+make cs-fix    # auto-fix code style violations
+make shell     # open a shell inside the container
+make down      # stop and remove the container
 ```
 
-More setup and usage details will follow as the implementation progresses.
+### Fallback (local PHP, no Docker)
+
+If you have PHP 8.3+ and Composer installed locally:
+
+```bash
+composer install
+./vendor/bin/phpunit
+./vendor/bin/phpstan analyse
+./vendor/bin/php-cs-fixer check --diff
+```
