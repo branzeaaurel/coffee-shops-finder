@@ -1,0 +1,9 @@
+services:
+  app:
+    build: .
+    user: "${DOCKER_USER:-1000:1000}"
+    environment:
+      HOME: /tmp
+    volumes:
+      - .:/app
+    working_dir: /app
