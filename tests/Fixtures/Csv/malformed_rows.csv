@@ -1,0 +1,9 @@
+Name,X,Y
+Valid First,1.0,2.0
+
+,3,4
+Bad Coords,abc,def
+Overflow X,1e500,5
+Bad Y Only,1.0,abc
+Wrong Column Count,1
+Valid Last,10,20
