@@ -23,7 +23,7 @@ test:
 	$(PHP) vendor/bin/phpunit
 
 stan:
-	$(PHP) vendor/bin/phpstan analyse
+	$(PHP) vendor/bin/phpstan analyse --memory-limit=512M
 
 cs-check:
 	$(PHP) vendor/bin/php-cs-fixer check --diff
