@@ -76,13 +76,20 @@ final class CsvLocationParserTest extends TestCase
         iterator_to_array($parser->parse(self::FIXTURES.'/empty.csv'), false);
     }
 
-    public function testThrowsOnInvalidHeader(): void
+    public function testFirstRowIsTreatedAsDataWhenNotAValidHeader(): void
     {
-        $parser = new CsvLocationParser(new NullLogger());
+        $handler = new TestHandler();
+        $parser = new CsvLocationParser(new Logger('test', [$handler]));
 
-        $this->expectException(NoValidLocationsException::class);
+        $result = iterator_to_array($parser->parse(self::FIXTURES.'/invalid_header.csv'), false);
 
-        iterator_to_array($parser->parse(self::FIXTURES.'/invalid_header.csv'), false);
+        self::assertSame(['1'], self::names($result));
+
+        $reasons = array_map(
+            static fn (LogRecord $record): string => (string) ($record->context['reason'] ?? ''),
+            $handler->getRecords(),
+        );
+        self::assertSame(['non_numeric_x'], $reasons);
     }
 
     public function testThrowsOnHeaderOnly(): void

@@ -5,7 +5,7 @@ export DOCKER_USER
 PHP            = $(DOCKER_COMPOSE) exec app php
 COMPOSER       = $(DOCKER_COMPOSE) exec app composer
 
-.PHONY: up down install shell test stan cs-check cs-fix
+.PHONY: up down install shell test stan cs-check cs-fix serve
 
 up:
 	$(DOCKER_COMPOSE) up -d --build
@@ -30,3 +30,6 @@ cs-check:
 
 cs-fix:
 	$(PHP) vendor/bin/php-cs-fixer fix
+
+serve:
+	$(PHP) -S 0.0.0.0:8080 -t public/

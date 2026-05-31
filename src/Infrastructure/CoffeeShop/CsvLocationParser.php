@@ -19,7 +19,7 @@ class CsvLocationParser
     private const REASON_NON_FINITE_COORDINATES = 'non_finite_coordinates';
 
     /** @var list<string> */
-    private const EXPECTED_HEADER = ['Name', 'X', 'Y'];
+    private const EXPECTED_HEADER = ['name', 'x', 'y'];
 
     public function __construct(
         private readonly LoggerInterface $logger,
@@ -37,24 +37,25 @@ class CsvLocationParser
         }
 
         try {
-            $header = fgetcsv($handle);
-            if (false === $header || !$this->isValidHeader($header)) {
-                throw new NoValidLocationsException(sprintf('Invalid or missing CSV header in %s.', $filePath));
+            $validCount = 0;
+            $rowNumber = 0;
+
+            $row = fgetcsv($handle);
+            if (false !== $row && $this->isValidHeader($row)) {
+                ++$rowNumber;
+                $row = fgetcsv($handle);
             }
 
-            $validCount = 0;
-            $rowNumber = 1;
-
-            while (false !== ($row = fgetcsv($handle))) {
+            while (false !== $row) {
                 ++$rowNumber;
 
                 $named = $this->parseRow($row, $rowNumber);
-                if (null === $named) {
-                    continue;
+                if (null !== $named) {
+                    ++$validCount;
+                    yield $named;
                 }
 
-                ++$validCount;
-                yield $named;
+                $row = fgetcsv($handle);
             }
 
             if (0 === $validCount) {
@@ -75,7 +76,7 @@ class CsvLocationParser
         }
 
         $normalized = array_map(
-            static fn (?string $value): string => trim((string) $value),
+            static fn (?string $value): string => strtolower(trim((string) $value)),
             $header,
         );
 

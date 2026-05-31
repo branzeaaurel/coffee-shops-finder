@@ -5,6 +5,15 @@
          colors="true"
          cacheDirectory=".phpunit.cache"
 >
+    <php>
+        <server name="APP_ENV" value="test" force="true"/>
+        <server name="APP_DEBUG" value="1" force="true"/>
+        <server name="APP_SECRET" value="test_secret" force="true"/>
+        <server name="KERNEL_CLASS" value="App\Kernel" force="true"/>
+        <server name="CSV_FETCH_URL" value="http://invalid.test/coffee.csv" force="true"/>
+        <server name="CSV_FETCH_TIMEOUT_SECONDS" value="5" force="true"/>
+        <server name="CSV_CACHE_TTL_SECONDS" value="300" force="true"/>
+    </php>
     <testsuites>
         <testsuite name="Project Test Suite">
             <directory>tests</directory>
