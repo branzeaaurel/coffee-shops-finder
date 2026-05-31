@@ -1,0 +1,23 @@
+### Valid request - acceptance example from challenge
+GET http://localhost:8080/api/coffee-shops/nearest?x=47.6&y=-122.4
+Accept: application/json
+
+### Missing x parameter
+GET http://localhost:8080/api/coffee-shops/nearest?y=-122.4
+Accept: application/json
+
+### Missing y parameter
+GET http://localhost:8080/api/coffee-shops/nearest?x=47.6
+Accept: application/json
+
+### Non-numeric x
+GET http://localhost:8080/api/coffee-shops/nearest?x=abc&y=-122.4
+Accept: application/json
+
+### Array input - should return 400 not 500
+GET http://localhost:8080/api/coffee-shops/nearest?x[]=1&y=0
+Accept: application/json
+
+### Non-finite x
+GET http://localhost:8080/api/coffee-shops/nearest?x=1e309&y=0
+Accept: application/json
