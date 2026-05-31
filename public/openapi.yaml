@@ -1,0 +1,121 @@
+openapi: 3.0.3
+info:
+  title: Coffee Shops Finder API
+  version: 1.0.0
+  description: Returns the three nearest coffee shops to a given user location.
+servers:
+  - url: http://localhost:8080
+paths:
+  /api/coffee-shops/nearest:
+    get:
+      summary: Find the three nearest coffee shops
+      parameters:
+        - name: x
+          in: query
+          required: true
+          description: User x coordinate.
+          schema:
+            type: number
+        - name: y
+          in: query
+          required: true
+          description: User y coordinate.
+          schema:
+            type: number
+      responses:
+        '200':
+          description: Up to three nearest coffee shops, ordered by ascending distance.
+          content:
+            application/json:
+              schema:
+                type: array
+                maxItems: 3
+                items:
+                  $ref: '#/components/schemas/CoffeeShop'
+              example:
+                - name: Starbucks Seattle2
+                  location:
+                    x: 47.5869
+                    y: -122.3368
+                  distance: 0.0645
+                - name: Starbucks Seattle
+                  location:
+                    x: 47.5809
+                    y: -122.316
+                  distance: 0.0861
+                - name: Starbucks SF
+                  location:
+                    x: 37.5209
+                    y: -122.334
+                  distance: 10.0793
+        '400':
+          description: Missing, non-numeric, array-style, or non-finite x/y.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: INVALID_COORDINATES
+                  message: Query parameter "x" must be a finite number.
+        '422':
+          description: Upstream data exists but has no valid locations.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: NO_VALID_LOCATIONS
+                  message: No valid coffee shop locations are available.
+        '503':
+          description: Upstream CSV unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: COFFEE_SHOPS_UNAVAILABLE
+                  message: Coffee shop data is temporarily unavailable. Please try again later.
+        '500':
+          description: Unexpected internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: INTERNAL_ERROR
+                  message: An unexpected error occurred. Please try again later.
+components:
+  schemas:
+    CoffeeShop:
+      type: object
+      required: [name, location, distance]
+      properties:
+        name:
+          type: string
+        location:
+          type: object
+          required: [x, y]
+          properties:
+            x:
+              type: number
+            y:
+              type: number
+        distance:
+          type: number
+          description: Euclidean distance from the requested coordinates, rounded to 4 decimal places.
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: string
+            message:
+              type: string
