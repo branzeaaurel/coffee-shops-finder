@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  ci:
+    name: ci
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Start
+        run: make up
+
+      - name: Install
+        run: make install
+
+      - name: Test
+        run: make test
+
+      - name: PHPStan
+        run: make stan
+
+      - name: CS check
+        run: make cs-check
