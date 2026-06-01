@@ -1,0 +1,37 @@
+parameters:
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/Kernel.php'
+
+    App\Controller\:
+        resource: '../src/Controller/'
+        tags: ['controller.service_arguments']
+
+    App\Infrastructure\CoffeeShop\HttpCsvFetcher:
+        arguments:
+            $url: '%env(CSV_FETCH_URL)%'
+            $timeoutSeconds: '%env(int:CSV_FETCH_TIMEOUT_SECONDS)%'
+
+    App\Infrastructure\CoffeeShop\CsvFileCache:
+        arguments:
+            $filePath: '%kernel.cache_dir%/coffee_shops.csv'
+            $ttlSeconds: '%env(int:CSV_CACHE_TTL_SECONDS)%'
+
+    App\Application\CoffeeShop\CoffeeShopProviderInterface:
+        alias: App\Infrastructure\CoffeeShop\RemoteCsvCoffeeShopProvider
+
+    App\Domain\Location\DistanceCalculatorInterface:
+        alias: App\Domain\Location\EuclideanDistanceCalculator
+
+when@test:
+    services:
+        App\Application\CoffeeShop\CoffeeShopProviderInterface:
+            alias: App\Infrastructure\CoffeeShop\RemoteCsvCoffeeShopProvider
+            public: true
