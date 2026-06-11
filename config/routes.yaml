@@ -2,3 +2,8 @@ nearest_coffee_shops:
     path: /api/coffee-shops/nearest
     controller: App\Controller\NearestCoffeeShopsController
     methods: [GET]
+
+coffee_shops_graphql:
+    path: /api/graphql
+    controller: App\Controller\GraphQlController
+    methods: [POST]
