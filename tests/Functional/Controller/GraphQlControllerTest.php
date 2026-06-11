@@ -110,6 +110,27 @@ final class GraphQlControllerTest extends KernelTestCase
         self::assertStringNotContainsString('Private internal detail.', (string) $response->getContent());
     }
 
+    public function testMalformedJsonBodyReturnsInvalidRequestError(): void
+    {
+        $kernel = self::bootKernel();
+
+        $response = $kernel->handle(Request::create(
+            self::ENDPOINT,
+            Request::METHOD_POST,
+            content: '{ not valid json',
+        ));
+
+        self::assertSame(Response::HTTP_OK, $response->getStatusCode());
+        self::assertSame([
+            'errors' => [
+                [
+                    'message' => 'Invalid JSON request.',
+                    'extensions' => ['code' => 'INVALID_REQUEST'],
+                ],
+            ],
+        ], self::json($response));
+    }
+
     /**
      * @param array<string, mixed> $variables
      */

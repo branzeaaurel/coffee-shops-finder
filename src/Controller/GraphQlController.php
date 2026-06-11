@@ -21,8 +21,19 @@ final readonly class GraphQlController
 
     public function __invoke(Request $request): JsonResponse
     {
-        /** @var array{query?: string, variables?: array<string, mixed>|null} $input */
-        $input = json_decode($request->getContent(), true, flags: JSON_THROW_ON_ERROR);
+        try {
+            /** @var array{query?: string, variables?: array<string, mixed>|null} $input */
+            $input = json_decode((string) $request->getContent(), true, flags: JSON_THROW_ON_ERROR);
+        } catch (\JsonException) {
+            return new JsonResponse([
+                'errors' => [
+                    [
+                        'message' => 'Invalid JSON request.',
+                        'extensions' => ['code' => 'INVALID_REQUEST'],
+                    ],
+                ],
+            ]);
+        }
 
         $result = GraphQL::executeQuery(
             $this->schemaFactory->create(),
