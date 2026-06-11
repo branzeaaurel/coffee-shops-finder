@@ -21,3 +21,37 @@ Accept: application/json
 ### Non-finite x
 GET http://localhost:8080/api/coffee-shops/nearest?x=1e309&y=0
 Accept: application/json
+
+### GraphQL - nearest coffee shops (acceptance example)
+POST http://localhost:8080/api/graphql
+Content-Type: application/json
+
+{
+  "query": "query($x: Float!, $y: Float!) { nearestCoffeeShops(x: $x, y: $y) { name location { x y } distance } }",
+  "variables": { "x": 4, "y": -122.4 }
+}
+
+### GraphQL - inline arguments
+POST http://localhost:8080/api/graphql
+Content-Type: application/json
+
+{
+  "query": "{ nearestCoffeeShops(x: 47.6, y: -122.4) { name distance } }"
+}
+
+### GraphQL - missing required argument (validation error, HTTP 200)
+POST http://localhost:8080/api/graphql
+Content-Type: application/json
+
+{
+  "query": "{ nearestCoffeeShops(x: 47.6) { name } }"
+}
+
+### GraphQL - mapped domain error -> errors[0].extensions.code (e.g. COFFEE_SHOPS_UNAVAILABLE / INTERNAL_ERROR)
+# HTTP 200 with: { "errors": [{ "message": "...", "extensions": { "code": "..." } }], "data": { "nearestCoffeeShops": null } }
+POST http://localhost:8080/api/graphql
+Content-Type: application/json
+
+{
+  "query": "{ nearestCoffeeShops(x: 47.6, y: -122.4) { name } }"
+}
